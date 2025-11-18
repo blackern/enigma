@@ -130,6 +130,9 @@
             } else if (resposta === 'minotauro') {
                 feedbackMsg.style.color = '#e74c3c';
                 feedbackMsg.textContent = 'Essa é a fera, não o herói que a derrotou.';
+            } else if (resposta === '') {
+                feedbackMsg.style.color = '#e74c3c';
+                feedbackMsg.textContent = 'Não conhece a lenda do herói?';
             } else {
                 feedbackMsg.style.color = '#e74c3c';
                 feedbackMsg.textContent = 'As paredes ecoam... mas não é este o nome.';
@@ -138,3 +141,4 @@
     </script>
 </body>
 </html>
+
