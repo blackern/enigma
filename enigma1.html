@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Enigma da Carta</title>
+    <link rel="icon" type="image/gif" href="images/icon.png"
+            sizes="16x16">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body{
+            background-color: black;
+            color: white;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+            flex-direction: column; 
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .card-container {
+            width: 200px;
+            height: 290px;
+            perspective: 1000px;
+            cursor: pointer;
+            margin: 0 auto;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        .card-container.flip .card-inner {
+            transform: rotateY(180deg);
+        }
+        .carta-setada, .carta-flipada {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #000000;
+        }
+        .carta-flipada {
+            transform: rotateY(180deg);
+        }
+        .carta-setada img, .carta-flipada img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .dicas-container {
+            margin-top: 30px;
+            opacity: 0;
+            transition: opacity 0.5s 0.3s ease-in-out;
+            pointer-events: none;
+        }
+        .dicas-container.visivel {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .dica-card {
+            background: #1c1c1c;
+            border: 2px solid #b9b9b9;
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 14px;
+        }
+        .resposta-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 350px;
+            opacity: 0;
+            transition: opacity 0.5s 0.3s ease-in-out;
+            pointer-events: none;
+        }
+        .resposta-container.visivel {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #respostaInput {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #b9b9b9;
+            background-color: #1c1c1c;
+            color: white;
+            text-align: center;
+        }
+        #verificarBtn {
+            padding: 8px 20px;
+            border-radius: 5px;
+            border: none;
+            background-color: #ffffff;
+            color: black;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Qual carta será que está setada?</h1>
+    <div class="card-container" id="carta">
+        <div class="card-inner">
+            <div class="carta-setada">
+                <img src="images/cover.jpg" alt="Carta Setada">
+            </div>
+            <div class="carta-flipada">
+                <img src="images/monstro.jpg" alt="Carta Flipada">
+            </div>
+        </div>
+    </div>
+    <div id="dicas-container" class="dicas-container container">
+        <div class="row justify-content-center g-3">
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="dica-card">Sou um monstro de Nível 2.</div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="dica-card">Meu Atributo é TERRA.</div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="dica-card">Tenho 700 de ATK e 700 de DEF.</div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="dica-card">Meu efeito descarta sua mão inteira e compra 5 cartas.</div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="dica-card">Meus Tipos são ROCHA/EFEITO.</div>
+            </div>
+        </div>
+    </div>
+    <div id="resposta-container" class="resposta-container">
+        <input type="text" id="respostaInput" placeholder="Qual o nome do monstro?" autocomplete="off">
+        <button id="verificarBtn">Verificar</button>
+        <p id="feedbackMsg"></p>
+    </div>
+    <script>
+        const carta = document.getElementById('carta');
+        const dicasContainer = document.getElementById('dicas-container');
+        const respostaContainer = document.getElementById('resposta-container');
+        const verificarBtn = document.getElementById('verificarBtn');
+        const respostaInput = document.getElementById('respostaInput');
+        const feedbackMsg = document.getElementById('feedbackMsg');
+        carta.addEventListener('click', function() {
+            carta.classList.toggle('flip');
+            if (carta.classList.contains('flip')) {
+                dicasContainer.classList.add('visivel');
+                respostaContainer.classList.add('visivel');
+            } else {
+                dicasContainer.classList.remove('visivel');
+                respostaContainer.classList.remove('visivel');
+                feedbackMsg.textContent = '';
+            }
+        });
+        verificarBtn.addEventListener('click', function() {
+            const resposta = respostaInput.value.trim().toLowerCase();
+            if (resposta === '33508719') {
+                feedbackMsg.style.color = '#008000';
+                feedbackMsg.textContent = 'Parabéns, você acertou!';
+                setTimeout(() => {
+                    window.location.href = 'enigma2.html';
+                }, 1000);
+            } else if (resposta === 'morphing jar' || resposta === 'jarra da metamorfose' || resposta === 'jarro metamórfico' || resposta === 'jarro metamorfico') {
+                feedbackMsg.style.color = '#ffde21';
+                feedbackMsg.textContent = 'Você está no caminho certo, mas qual seria o codigo de indentificação dele?'
+            } else if (resposta === '') {
+                feedbackMsg.style.color = '#e74c3c';
+                feedbackMsg.textContent = 'Serio que com 5 dicas você não digitou nada???'
+            } else {
+                feedbackMsg.style.color = '#e74c3c';
+                feedbackMsg.textContent = 'Resposta incorreta. Tente novamente!';
+            }
+        });
+    </script>
+</body>
+</html>
